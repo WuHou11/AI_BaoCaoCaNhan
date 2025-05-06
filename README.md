@@ -24,7 +24,7 @@
 ### 2.3. Local Search
 
   ![Local Search](Local%20search.gif)
-
+  ![Local](local.png)
 ### 2.4. Constraint Satisfaction Problems (CSPs)
 
   ![CSPs](CSPs.gif)
