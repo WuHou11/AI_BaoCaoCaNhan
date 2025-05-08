@@ -1,9 +1,9 @@
 # Bài tập Cá nhân AI
 ## Bùi Quốc Hậu-23110211
-## Giới thiệu bài toán 8-puzzle
+##    Giới thiệu bài toán 8-puzzle
 Bài toán 8-puzzle là một bài toán kinh điển trong trí tuệ nhân tạo và thuật toán tìm kiếm. Bài toán gồm một bảng 3x3 chứa 8 ô số từ 1 đến 8 và một ô trống (ký hiệu là 0 hoặc ô rỗng).Các ô có thể di chuyển lên, xuống, trái, phải vào vị trí ô trống với mục tiêu là đưa bảng từ trạng thái ban đầu về trạng thái đích.
 ### 1. Mục tiêu: 
-Trong đồ án cá nhân này, mục tiêu chính là xây dựng một chương trình để giải quyết bài toán 8-puzzle. Đồ án tập trung vào việc nghiên cứu và áp dụng 6 nhóm thuật toán tìm kiếm tiêu biểu trong trí tuệ nhân tạo. Từ đó giúp người học hiểu rõ những đặc trưng, cách thức hoạt và giới hạn của từng thuật toán. 6 nhóm thuật toán chính là: 
+Trong đồ án cá nhân này, mục tiêu chính là xây dựng một chương trình để giải quyết bài toán 8-puzzle. Đồ án tập trung vào việc nghiên cứu và áp dụng 6 nhóm thuật toán tìm kiếm tiêu biểu trong trí tuệ nhân tạo. Từ đó giúp người học hiểu rõ những đặc trưng, cách thức hoạt động và giới hạn của từng thuật toán. 6 nhóm thuật toán chính là: 
 
 - Nhóm thuật toán tìm kiếm không có thông tin (Uninformed Search): Breadth-First Search (BFS), Depth-First Search (DFS), Iterative Deepening Search (IDS) và Uniform Cost Search (UCS). Nhóm này giúp đánh giá khả năng giải quyết bài toán khi không có thông tin định hướng, dựa hoàn toàn vào cấu trúc của không gian trạng thái.
 - Nhóm thuật toán tìm kiếm có thông tin (Informed Search): Sử dụng hàm heuristic để cải thiện hiệu quả tìm kiếm, bao gồm A*, Iterative Deepening A* (IDA*) và Greedy Best-First Search. Nhóm này kết hợp thông tin ước lượng để dẫn dắt quá trình tìm kiếm nhanh chóng hơn.
@@ -57,6 +57,7 @@ Các thành phần chính của bài toán tìm kiếm và giải pháp:
 - Hành động(Action): Di chuyển ô trống lên, xuống, trái, hoặc phải để hoán đổi với ô số liền kề.
 - Chi phí(Cost function): Mỗi bước di chuyển có chi phí bằng 1, vì bài toán ưu tiên tìm đường đi ngắn nhất.
 + Giải pháp(solution): Dãy các trạng thái từ trạng thái ban đầu đến trạng thái mục tiêu, được tạo ra bởi các thuật toán tìm kiếm có thông tin GBFS, A*, và IDA*.
+
   ![Informed Search](Informed%20search.gif)
 
 *Nhận xét:*
@@ -81,6 +82,7 @@ Các thành phần chính của bài toán tìm kiếm và giải pháp:
 - Hành động(Action): Di chuyển ô trống lên, xuống, trái, hoặc phải để hoán đổi với ô số liền kề.
 - Chi phí(Cost function): Mỗi bước di chuyển có chi phí bằng 1, vì bài toán ưu tiên tìm đường đi ngắn nhất.
 + Giải pháp(solution): Dãy các trạng thái từ trạng thái ban đầu đến trạng thái mục tiêu, được tạo ra bởi các thuật toán tìm kiếm cục bộ Simple Hill Climbing, Steepest-Ascent Hill Climbing, Stochastic Hill Climbing, Simulated Annealing, Beam Search và Genetic Algorithm .
+
   ![Local Search](Local%20search.gif)
   ![Local](local.png)
 
