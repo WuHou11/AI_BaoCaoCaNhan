@@ -8,7 +8,7 @@ Trong đồ án cá nhân này, mục tiêu chính là xây dựng một chươn
 - Nhóm thuật toán tìm kiếm không có thông tin (Uninformed Search): Breadth-First Search (BFS), Depth-First Search (DFS), Iterative Deepening Search (IDS) và Uniform Cost Search (UCS). Nhóm này giúp đánh giá khả năng giải quyết bài toán khi không có thông tin định hướng, dựa hoàn toàn vào cấu trúc của không gian trạng thái.
 - Nhóm thuật toán tìm kiếm có thông tin (Informed Search): Sử dụng hàm heuristic để cải thiện hiệu quả tìm kiếm, bao gồm A*, Iterative Deepening A* (IDA*) và Greedy Best-First Search. Nhóm này kết hợp thông tin ước lượng để dẫn dắt quá trình tìm kiếm nhanh chóng hơn.
 - Nhóm thuật toán tìm kiếm cục bộ (Local Search): Simple Hill Climbing, Steepest-Ascent Hill Climbing, Stochastic Hill Climbing, Simulated Annealing, Beam Search và Genetic Algorithm. Nhóm này tập trung vào việc cải thiện lời giải hiện tại dựa trên thông tin cục bộ, không cần lưu toàn bộ không gian trạng thái, phù hợp với các bài toán có không gian lớn hoặc thiếu tài nguyên.
-- Nhóm thuật toán tìm kiếm trong môi trường phức tạp (Searching in Complex Environments): AND-OR Graph Search, Searching with Partial Observability, và Min-conflicts. Đây là nhóm mở rộng ứng dụng sang các bài toán có tính không chắc chắn, thông tin không đầy đủ, hoặc thay đổi theo thời gian.
+- Nhóm thuật toán tìm kiếm trong môi trường phức tạp (Searching in Complex Environments): AND-OR Graph Search, Searching with Partial Observability, và Belief State Search. Đây là nhóm mở rộng ứng dụng sang các bài toán có tính không chắc chắn, thông tin không đầy đủ, hoặc thay đổi theo thời gian.
 - Bài toán thỏa mãn ràng buộc (Constraint Satisfaction Problems - CSP): Áp dụng các thuật toán như Backtracking, Forward-Checking, và Min-Conflicts, nhằm thử nghiệm khả năng biểu diễn bài toán 8-puzzle như một hệ thống ràng buộc logic.
 - Học tăng cường (Reinforcement Learning): Cụ thể là thuật toán Q-learning, cho phép tác nhân học cách giải bài toán thông qua quá trình tương tác liên tục với môi trường. Nhóm này đại diện cho hướng tiếp cận hiện đại, nơi giải pháp không được lập trình sẵn mà được học thông qua kinh nghiệm.
 
@@ -103,6 +103,12 @@ Các thành phần chính của bài toán tìm kiếm và giải pháp:
 - Hàm chi phí (Cost Function): Mỗi bước di chuyển có chi phí bằng 1 (tương ứng với một lần di chuyển ô trống).
 - Tập niềm tin (Belief States): Thay vì chỉ làm việc với một trạng thái duy nhất, bài toán sử dụng tập niềm tin (một tập hợp các trạng thái có thể xảy ra).
 - Giải pháp(solution): Tìm đường đi từ tập niềm tin ban đầu đến trạng thái mục tiêu, trong đó ít nhất một trạng thái trong tập niềm tin khớp với một trạng thái mục tiêu.
+
+ Belief state search:
+ ![Belief state search](Belief%20state%20search.gif)
+ Searching with Partial Observability: 
+ ![Searching with Partial Observability](Searching%20with%20Partial%20Observability.gif)
+ ![and-or](AND-OR%20Graph%20search.gif)
 
 #### *2.5. Bài toán thỏa mãn ràng buộc (Constraint Satisfaction Problems (CSPs))*
 Các thành phần chính của bài toán tìm kiếm và giải pháp: 
