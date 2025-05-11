@@ -8,8 +8,7 @@ import platform
 import asyncio
 import numpy as np
 
-# Program A: Search-based 8-Puzzle Solver
-class ProgramA:
+class Base:
     class EightPuzzle:
         def __init__(self, initial, goal):
             self.initial = tuple(map(tuple, initial))
@@ -807,8 +806,7 @@ class ProgramA:
         
         pygame.quit()
 
-# Program B: CSP-based 8-Puzzle Solver
-class ProgramB:
+class CSPs:
     class EightPuzzle:
         def __init__(self, initial, goal):
             self.initial = tuple(map(tuple, initial))
@@ -1220,13 +1218,13 @@ class ProgramB:
                         self.print_solution(solution)
                         print(f"Thời gian thực thi: {elapsed_time:.10f} giây")
                         algorithm_run = True
-                    elif 20 <= x <= 220 and 170 <= y <= 210:  # Reset
-                        solution = [initial_state]  # Set solution to initial state
+                    elif 20 <= x <= 220 and 170 <= y <= 210: 
+                        solution = [initial_state]  
                         step = 0
                         elapsed_time = None
                         algorithm_run = False
-                        puzzle = self.EightPuzzle(initial_state, goal_state)  # Reinitialize puzzle
-                        self.draw_grid(screen, initial_state, 100, 250, 50)  # Redraw initial grid
+                        puzzle = self.EightPuzzle(initial_state, goal_state)  
+                        self.draw_grid(screen, initial_state, 100, 250, 50)  
                         pygame.display.flip()
 
             pygame.display.flip()
@@ -1234,7 +1232,7 @@ class ProgramB:
 
         pygame.quit()
 
-class ProgramC:
+class Belief:
     class EightPuzzle:
         def __init__(self, initial, goals):
             self.initial = tuple(map(tuple, initial))
@@ -1293,7 +1291,7 @@ class ProgramC:
             visited = {}
 
             while pq:
-                time.sleep(0.1)  # Add 10ms delay per iteration
+                time.sleep(0.1)  
                 f, g, belief, path, belief_history = heapq.heappop(pq)
                 belief_key = frozenset(belief)
                 if belief_key in visited and visited[belief_key] <= f:
@@ -1520,9 +1518,9 @@ async def main():
     font = pygame.font.Font(None, 36)
 
     buttons = [
-        ("Run Program A", (100, 50)),
-        ("Run Program B", (100, 150)),
-        ("Run Program C", (100, 250)),  
+        ("Run Base", (100, 50)),
+        ("Run CSPS", (100, 150)),
+        ("Run Belief", (100, 250)),  
     ]
 
     running = True
@@ -1543,14 +1541,14 @@ async def main():
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                if 100 <= x <= 300 and 50 <= y <= 90:  # Run Program A
-                    program_a = ProgramA()
+                if 100 <= x <= 300 and 50 <= y <= 90:  
+                    program_a = Base()
                     await program_a.run()
-                elif 100 <= x <= 300 and 150 <= y <= 190:  # Run Program B
-                    program_b = ProgramB()
+                elif 100 <= x <= 300 and 150 <= y <= 190:  
+                    program_b = CSPs()
                     program_b.run()
-                elif 100 <= x <= 300 and 250 <= y <= 290:  # Run Program C
-                    program_c = ProgramC()
+                elif 100 <= x <= 300 and 250 <= y <= 290:  
+                    program_c = Belief()
                     await program_c.run()
 
         pygame.display.flip()
