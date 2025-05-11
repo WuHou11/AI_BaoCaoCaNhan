@@ -109,7 +109,10 @@ Các thành phần chính của bài toán tìm kiếm và giải pháp:
  Searching with Partial Observability: 
  ![Searching with Partial Observability](Searching%20with%20Partial%20Observability.gif)
  ![and-or](AND-OR%20Graph%20search.gif)
-
+*Nhận xét:*
+- Belief State Search: thời gian thực thi cao nhất vì thuật toán phải duy trì và cập nhật một tập hợp các trạng thái khả dĩ trong môi trường không xác định.Phù hợp cho các bài toán có tính không xác định cao, nhưng đánh đổi về hiệu năng.
+- Partial Observable Search: Thời gian thực thi nhanh hơn Belief state search, nó hoạt động tốt trong môi trường chỉ quan sát được một phần trạng thái, nhanh hơn vì giới hạn phạm vi tìm kiếm ở mức độ phù hợp với thông tin hiện có.
+- AND-OR Graph Search: Thời gian thực thi nhanh nhất, thuật toán này phù hợp nhất khi bài toán có cấu trúc phân nhánh rõ ràng và có thể mô hình hóa các điều kiện theo logic AND và OR.
 #### *2.5. Bài toán thỏa mãn ràng buộc (Constraint Satisfaction Problems (CSPs))*
 Các thành phần chính của bài toán tìm kiếm và giải pháp: 
 
@@ -134,3 +137,29 @@ Các thành phần chính của bài toán tìm kiếm và giải pháp:
 - Backtracking with Forward Checking: Nhanh hơn Backtracking vì loại bỏ trước những giá trị không hợp lệ. Việc kiểm tra ràng buộc sớm giúp giảm số nhánh cần xét vì thế thời gian thực thi nhanh hơn.
 - Min-Conflicts: Là thuật toán heuristic nên không duyệt toàn bộ không gian tìm kiếm. Bắt đầu từ lời giải ngẫu nhiên và sửa dần mâu thuẫn, rất nhanh với bài toán phù hợp, đặc biệt là các bài toán dễ sửa lỗi cục bộ.
 #### *2.6 Học tăng cường (Reinforcement Learning)*
+Các thành phần chính của bài toán tìm kiếm và giải pháp
+
+- Trạng thái ban đầu(Initial state): Bảng 3x3 với 8 số từ 1 đến 8 và một ô trống (0), đại diện cho trạng thái khởi đầu của bài toán:
+([[1 2 0], 
+  [5 6 3], 
+  [4 7 8]
+ ])
+- Trạng thái đích(Goal state): Bảng 3x3 với thứ tự số từ 1 đến 8 và ô trống ở vị trí cuối cùng: 
+([[1 2 3], 
+  [4 5 6], 
+  [7 8 0]
+ ]).                                                                                     
+- Không gian trạng thái(State space): Tập hợp tất cả các cấu hình có thể của lưới 3x3, được tạo ra bằng cách hoán đổi ô trống với các ô liền kề hợp lệ. Thuật toán Q-Learning học chính sách tối ưu thông qua việc khám phá không gian trạng thái này.
+- Hành động(Action): Di chuyển ô trống lên, xuống, trái, hoặc phải để hoán đổi với ô số liền kề.
+- Chi phí(Cost function): Trong thuật toán này chi phí được hiểu cách khác là phần thưởng. Mỗi bước di chuyển được gán một phần thưởng âm nhỏ, vì bài toán tập trung vào tối ưu hóa tổng phần thưởng tích lũy để tìm đường đi từ trạng thái ban đầu đến trạng thái mục tiêu. Agent nhận phần thưởng lớn khi đạt trạng thái mục tiêu.
++ Giải pháp(solution): Một dãy các trạng thái từ trạng thái ban đầu đến trạng thái mục tiêu, được tạo ra bởi thuật toán Q-Learning. Thuật toán học chính sách tối ưu bằng cách cập nhật bảng Q (Q-table) dựa trên phần thưởng, sau đó trích xuất đường đi từ bảng Q đã học.
+
+ ![Qlearning](Q_learning.gif)
+
+*Nhận xét:*
+Q-Learning: Thuật toán sử dụng chiến lược Epsilon-Greedy để cân bằng giữa khám phá và khai thác. Số trạng thái khám phá cao do Q-Learning cần thăm nhiều trạng thái trong quá trình học để xây dựng chính sách tối ưu. Thời gian chạy tương đối cao vì số lượng trạng thái lớn và chi phí tính toán mỗi bước bao gồm cập nhật Q-value, tính phần thưởng, và kiểm tra trạng thái lân cận. Tuy nhiên, Q-Learning đảm bảo hội tụ về chính sách tối ưu nếu có đủ thời gian học, phù hợp khi cần học chính sách dài hạn trong môi trường không xác định.
+
+
+🔗 ----------------------------------------
+
+SVTH: Bùi Quốc Hậu
