@@ -113,6 +113,7 @@ Các thành phần chính của bài toán tìm kiếm và giải pháp:
 - Belief State Search: thời gian thực thi cao nhất vì thuật toán phải duy trì và cập nhật một tập hợp các trạng thái khả dĩ trong môi trường không xác định.Phù hợp cho các bài toán có tính không xác định cao, nhưng đánh đổi về hiệu năng.
 - Partial Observable Search: Thời gian thực thi nhanh hơn Belief state search, nó hoạt động tốt trong môi trường chỉ quan sát được một phần trạng thái, nhanh hơn vì giới hạn phạm vi tìm kiếm ở mức độ phù hợp với thông tin hiện có.
 - AND-OR Graph Search: Thời gian thực thi nhanh nhất, thuật toán này phù hợp nhất khi bài toán có cấu trúc phân nhánh rõ ràng và có thể mô hình hóa các điều kiện theo logic AND và OR.
+
 #### *2.5. Bài toán thỏa mãn ràng buộc (Constraint Satisfaction Problems (CSPs))*
 Các thành phần chính của bài toán tìm kiếm và giải pháp: 
 
