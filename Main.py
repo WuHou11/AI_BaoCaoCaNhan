@@ -545,7 +545,6 @@ class Base:
         pygame.display.set_caption("8-Puzzle Solver (Program A)")
         clock = pygame.time.Clock()
         
-        #initial_state = [[1, 2, 3], [4, 0, 6], [7, 5, 8]]
         initial_state = [[1, 2, 0], [5, 6, 3], [4, 7, 8]]
         goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
         puzzle = self.EightPuzzle(initial_state, goal_state)
@@ -806,11 +805,13 @@ class Base:
         
         pygame.quit()
 
+FPS = 60
+
 class CSPs:
     class EightPuzzle:
         def __init__(self, initial, goal):
-            self.initial = tuple(map(tuple, initial))
-            self.goal = tuple(map(tuple, goal))
+            self.initial = [row[:] for row in initial]
+            self.goal = [row[:] for row in goal]
 
         def is_valid_assignment(self, state, pos, value):
             i, j = pos
@@ -818,14 +819,6 @@ class CSPs:
                 for c in range(3):
                     if (r, c) != pos and state[r][c] == value:
                         return False
-            if j > 0 and state[i][j - 1] != 0 and value != 0 and state[i][j - 1] != value - 1:
-                return False
-            if j < 2 and value != 0 and state[i][j + 1] != 0 and state[i][j + 1] != value + 1:
-                return False
-            if i > 0 and state[i - 1][j] != 0 and value != 0 and state[i - 1][j] != value - 3:
-                return False
-            if i < 2 and value != 0 and state[i + 1][j] != 0 and state[i + 1][j] != value + 3:
-                return False
             return True
 
         def is_solvable(self, state):
@@ -840,30 +833,18 @@ class CSPs:
         def count_conflicts(self, state):
             conflicts = 0
             value_counts = defaultdict(int)
-
             for i in range(3):
                 for j in range(3):
                     val = state[i][j]
-                    if val != 0:
-                        value_counts[val] += 1
-                        if value_counts[val] > 1:
-                            conflicts += 2 * (value_counts[val] - 1)
-
+                    value_counts[val] += 1
+                    if value_counts[val] > 1:
+                        conflicts += value_counts[val] - 1
             for i in range(3):
-                for j in range(2):
-                    if state[i][j] != 0 and state[i][j + 1] != 0:
-                        if state[i][j + 1] != state[i][j] + 1:
-                            conflicts += 1
-
-            for j in range(3):
-                for i in range(2):
-                    if state[i][j] != 0 and state[i + 1][j] != 0:
-                        if state[i + 1][j] != state[i][j] + 3:
-                            conflicts += 1
-
+                for j in range(3):
+                    if state[i][j] != self.goal[i][j]:
+                        conflicts += 1
             if not self.is_solvable(state):
-                conflicts += 10
-
+                conflicts += 2
             return conflicts
 
         def backtracking_search(self):
@@ -873,8 +854,8 @@ class CSPs:
             def backtrack(state, assigned, pos_index):
                 if pos_index == 9:
                     state_tuple = tuple(tuple(row) for row in state)
-                    if state_tuple == self.goal and self.is_solvable(state):
-                        path.append(state_tuple)
+                    if state_tuple == tuple(tuple(row) for row in self.goal) and self.is_solvable(state):
+                        path.append([row[:] for row in state])
                         return path
                     return None
 
@@ -883,9 +864,9 @@ class CSPs:
                 if state_tuple in visited:
                     return None
                 visited.add(state_tuple)
-                path.append(state_tuple)
+                path.append([row[:] for row in state])
 
-                for value in [1, 2, 3, 4, 5, 6, 7, 8, 0]:
+                for value in [0, 1, 2, 3, 4, 5, 6, 7, 8]:
                     if value not in assigned:
                         if self.is_valid_assignment(state, (i, j), value):
                             new_state = [row[:] for row in state]
@@ -909,7 +890,7 @@ class CSPs:
                 i, j = pos
                 domain = []
                 for value in [0, 1, 2, 3, 4, 5, 6, 7, 8]:
-                    if value not in assigned and self.is_valid_assignment(state, (i, j), value):
+                    if value not in assigned and self.is_valid_assignment(state, pos, value):
                         domain.append(value)
                 return domain
 
@@ -922,19 +903,8 @@ class CSPs:
                         if (r, c) not in assigned and (r, c) != pos:
                             if (r, c) in new_domains:
                                 new_domain = new_domains[(r, c)][:]
-                                if value != 0 and value in new_domain:
-                                    if r == i:
-                                        if c < j and value - 1 in new_domain:
-                                            new_domain = [v for v in new_domain if v == 0 or v == value - 1]
-                                        elif c > j and value + 1 in new_domain:
-                                            new_domain = [v for v in new_domain if v == 0 or v == value + 1]
-                                    if c == j:
-                                        if r < i and value - 3 in new_domain:
-                                            new_domain = [v for v in new_domain if v == 0 or v == value - 3]
-                                        elif r > i and value + 3 in new_domain:
-                                            new_domain = [v for v in new_domain if v == 0 or v == value + 3]
-                                    if value in new_domain:
-                                        new_domain.remove(value)
+                                if value in new_domain:
+                                    new_domain.remove(value)
                                 new_domains[(r, c)] = new_domain
                                 if not new_domain:
                                     success = False
@@ -967,8 +937,8 @@ class CSPs:
             def backtrack_with_fc(state, assigned, positions, domains):
                 if len(assigned) == 9:
                     state_tuple = tuple(tuple(row) for row in state)
-                    if state_tuple == self.goal and self.is_solvable(state):
-                        path.append(state_tuple)
+                    if state_tuple == tuple(tuple(row) for row in self.goal) and self.is_solvable(state):
+                        path.append([row[:] for row in state])
                         return path
                     return None
 
@@ -981,12 +951,11 @@ class CSPs:
                     return None
 
                 sorted_values = select_lcv_value(pos, domain, state, domains, assigned)
-
                 state_tuple = tuple(tuple(row) for row in state)
                 if state_tuple in visited:
                     return None
                 visited.add(state_tuple)
-                path.append(state_tuple)
+                path.append([row[:] for row in state])
 
                 for value in sorted_values:
                     new_state = [row[:] for row in state]
@@ -1010,36 +979,70 @@ class CSPs:
             result = backtrack_with_fc(empty_state, assigned, positions, domains)
             return result
 
-        def min_conflicts_search(self, max_steps=1000):
-            def find_blank(state):
-                for i in range(3):
-                    for j in range(3):
-                        if state[i][j] == 0:
-                            return i, j
-                return None
-
-            def get_neighbors(i, j):
-                neighbors = []
-                directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-                for di, dj in directions:
-                    ni, nj = i + di, j + dj
-                    if 0 <= ni < 3 and 0 <= nj < 3:
-                        neighbors.append((ni, nj))
-                return neighbors
-
+        def min_conflicts_search(self, max_iterations=5000, max_no_improvement=100, timeout=10.0):
             def count_conflicts(state):
                 conflicts = 0
-                goal_positions = {self.goal[i][j]: (i, j) for i in range(3) for j in range(3) if self.goal[i][j] != 0}
+                value_counts = defaultdict(int)
                 for i in range(3):
                     for j in range(3):
-                        if state[i][j] != 0:
-                            goal_i, goal_j = goal_positions.get(state[i][j], (i, j))
-                            conflicts += abs(i - goal_i) + abs(j - goal_j)
+                        val = state[i][j]
+                        value_counts[val] += 1
+                        if value_counts[val] > 1:
+                            conflicts += value_counts[val] - 1
+                for i in range(3):
+                    for j in range(3):
+                        if state[i][j] != self.goal[i][j]:
+                            conflicts += 1
+                if not self.is_solvable(state):
+                    conflicts += 1
                 return conflicts
+
+            def get_conflicting_positions(state):
+                conflict_positions = set()
+                value_counts = defaultdict(int)
+                for i in range(3):
+                    for j in range(3):
+                        val = state[i][j]
+                        value_counts[val] += 1
+                        if value_counts[val] > 1 or state[i][j] != self.goal[i][j]:
+                            conflict_positions.add((i, j))
+                if not self.is_solvable(state):
+                    for i in range(3):
+                        for j in range(3):
+                            conflict_positions.add((i, j))
+                return list(conflict_positions)
+
+            def select_min_conflict_value(state, i, j, current_value, assigned_values):
+                value_scores = []
+                state_copy = [row[:] for row in state]
+                for r in range(3):
+                    for c in range(3):
+                        if (r, c) != (i, j):
+                            state_copy = [row[:] for row in state]
+                            state_copy[i][j], state_copy[r][c] = state_copy[r][c], state_copy[i][j]
+                            if self.is_valid_assignment(state_copy, (i, j), state_copy[i][j]) and \
+                            self.is_valid_assignment(state_copy, (r, c), state_copy[r][c]):
+                                conflicts = count_conflicts(state_copy)
+                                value_scores.append((conflicts, state[r][c], (r, c)))
+                for value in range(9):
+                    if value not in assigned_values - ({current_value} if current_value is not None else set()):
+                        state_copy = [row[:] for row in state]
+                        state_copy[i][j] = value
+                        if self.is_valid_assignment(state_copy, (i, j), value):
+                            conflicts = count_conflicts(state_copy)
+                            value_scores.append((conflicts, value, None))
+                if not value_scores:
+                    return None, None
+                value_scores.sort()
+                return value_scores[0][1], value_scores[0][2]
 
             def is_valid_state(state):
                 flat = [state[i][j] for i in range(3) for j in range(3)]
                 return sorted(flat) == [0, 1, 2, 3, 4, 5, 6, 7, 8]
+
+            start_time = time.time()
+            num_explored_states = 0
+            path = []
 
             if is_valid_state(self.initial) and self.is_solvable(self.initial):
                 current_state = [row[:] for row in self.initial]
@@ -1060,61 +1063,75 @@ class CSPs:
                             current_state[i][j] = numbers[idx]
                             idx += 1
 
-            path = [tuple(tuple(row) for row in current_state)]
-            steps = 0
-            visited = set([tuple(tuple(row) for row in current_state)])
+            path.append([row[:] for row in current_state])
+            num_explored_states += 1
+            iteration = 0
+            no_improvement = 0
+            best_conflicts = count_conflicts(current_state)
 
-            while steps < max_steps:
-                current_state_tuple = tuple(tuple(row) for row in current_state)
-                if current_state_tuple == self.goal:
-                    print(f"Solution found after {steps} iterations")
-                    return path
+            while iteration < max_iterations:
+                if time.time() - start_time > timeout:
+                    print("Timeout reached")
+                    return None, num_explored_states
 
-                blank_i, blank_j = find_blank(current_state)
-                if blank_i is None:
-                    print("Invalid state: No blank tile found")
-                    return None
+                if tuple(tuple(row) for row in current_state) == tuple(tuple(row) for row in self.goal):
+                    print(f"Solution found after {iteration} iterations")
+                    return path, num_explored_states
 
-                neighbors = get_neighbors(blank_i, blank_j)
-                if not neighbors:
-                    print("No valid moves available")
-                    return None
+                conflicted_positions = get_conflicting_positions(current_state)
+                if not conflicted_positions:
+                    break
 
-                best_conflicts = float('inf')
-                best_states = []
+                i, j = random.choice(conflicted_positions)
+                current_value = current_state[i][j]
+                assigned_values = {current_state[r][c] for r in range(3) for c in range(3) if (r, c) != (i, j) and current_state[r][c] is not None}
+                new_value, swap_pos = select_min_conflict_value(current_state, i, j, current_value, assigned_values)
 
-                for ni, nj in neighbors:
-                    temp_state = [row[:] for row in current_state]
-                    temp_state[blank_i][blank_j], temp_state[ni][nj] = temp_state[ni][nj], temp_state[blank_i][blank_j]
-                    temp_state_tuple = tuple(tuple(row) for row in temp_state)
-                    if temp_state_tuple in visited:
-                        continue
-                    conflicts = count_conflicts(temp_state)
-                    if conflicts < best_conflicts:
-                        best_conflicts = conflicts
-                        best_states = [(temp_state, (ni, nj))]
-                    elif conflicts == best_conflicts:
-                        best_states.append((temp_state, (ni, nj)))
+                if new_value is None:
+                    break
 
-                if not best_states:
-                    ni, nj = random.choice(neighbors)
-                    temp_state = [row[:] for row in current_state]
-                    temp_state[blank_i][blank_j], temp_state[ni][nj] = temp_state[ni][nj], temp_state[blank_i][blank_j]
-                    best_states = [(temp_state, (ni, nj))]
+                if swap_pos:
+                    r, c = swap_pos
+                    current_state[i][j], current_state[r][c] = current_state[r][c], current_state[i][j]
+                else:
+                    current_state[i][j] = new_value
 
-                best_state, _ = random.choice(best_states)
-                current_state = best_state
-                current_state_tuple = tuple(tuple(row) for row in current_state)
-                visited.add(current_state_tuple)
-                path.append(current_state_tuple)
+                path.append([row[:] for row in current_state])
+                num_explored_states += 1
+                iteration += 1
 
-                steps += 1
+                current_conflicts = count_conflicts(current_state)
+                if current_conflicts < best_conflicts:
+                    best_conflicts = current_conflicts
+                    no_improvement = 0
+                else:
+                    no_improvement += 1
 
-            print("No solution found within max_steps")
-            return None
-        
+                if no_improvement >= max_no_improvement:
+                    numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                    random.shuffle(numbers)
+                    current_state = [[0 for _ in range(3)] for _ in range(3)]
+                    idx = 0
+                    for i in range(3):
+                        for j in range(3):
+                            current_state[i][j] = numbers[idx]
+                            idx += 1
+                    while not self.is_solvable(current_state):
+                        random.shuffle(numbers)
+                        idx = 0
+                        for i in range(3):
+                            for j in range(3):
+                                current_state[i][j] = numbers[idx]
+                                idx += 1
+                    path.append([row[:] for row in current_state])
+                    num_explored_states += 1
+                    best_conflicts = count_conflicts(current_state)
+                    no_improvement = 0
 
-    def draw_grid(self, screen, state, tile_size, offset_x, offset_y):
+            print("No solution found within max_iterations")
+            return None, num_explored_states
+
+    async def draw_grid(self, screen, state, tile_size, offset_x, offset_y):
         WHITE, BLACK = (255, 255, 255), (0, 0, 0)
         pygame.draw.rect(screen, WHITE, (offset_x, offset_y, 300, 300))
         font = pygame.font.Font(None, 50)
@@ -1130,7 +1147,7 @@ class CSPs:
             pygame.draw.line(screen, BLACK, (offset_x + i * tile_size, offset_y), (offset_x + i * tile_size, offset_y + 300), 2)
         pygame.display.flip()
 
-    def print_solution(self, solution):
+    def print_solution(self, solution, num_states=0):
         if solution is None or len(solution) == 0:
             print("Không tìm thấy đường đi đến trạng thái mục tiêu!")
             return
@@ -1139,15 +1156,15 @@ class CSPs:
             for row in state:
                 print(row)
             print()
-        print("Hoàn thành!")
+        print(f"Hoàn thành! Số trạng thái đã khám phá: {num_states}")
 
-    def run(self):
+    async def run(self):
         pygame.init()
         screen = pygame.display.set_mode((600, 400))
         pygame.display.set_caption("8-Puzzle Solver (Program B)")
         clock = pygame.time.Clock()
 
-        initial_state = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        initial_state = [[0 for _ in range(3)] for _ in range(3)]  # Tạo ma trận 3x3 với tất cả là 0
         goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
         puzzle = self.EightPuzzle(initial_state, goal_state)
 
@@ -1158,15 +1175,15 @@ class CSPs:
             ("Reset", (20, 170)),
         ]
         font = pygame.font.Font(None, 36)
-        running = True
         solution = None
         step = 0
         elapsed_time = None
         algorithm_run = False
 
+        running = True
         while running:
             screen.fill((255, 255, 255))
-            
+
             for text, pos in buttons:
                 pygame.draw.rect(screen, (139, 0, 0), (*pos, 200, 40))
                 button_width, button_height = 200, 40
@@ -1175,60 +1192,71 @@ class CSPs:
                 text_x = pos[0] + (button_width - text_width) // 2
                 text_y = pos[1] + (button_height - text_height) // 2
                 screen.blit(label, (text_x, text_y))
-            
-            if solution and algorithm_run and step < len(solution):
-                self.draw_grid(screen, solution[step], 100, 250, 50)
-                if step < len(solution) - 1:
-                    step += 1
-                    time.sleep(0.1)
+
+            if solution is not None and algorithm_run:
+                solution_path = solution[0] if isinstance(solution, tuple) else solution
+                if solution_path and step < len(solution_path):
+                    await self.draw_grid(screen, solution_path[step], 100, 250, 50)
+                    if step < len(solution_path) - 1:
+                        step += 1
+                        await asyncio.sleep(0.1)
+                else:
+                    await self.draw_grid(screen, puzzle.initial, 100, 250, 50)
             else:
-                self.draw_grid(screen, puzzle.initial, 100, 250, 50)
+                await self.draw_grid(screen, puzzle.initial, 100, 250, 50)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and not algorithm_run:
                     x, y = event.pos
-                    start_time = time.time()
-                    
                     if 20 <= x <= 220 and 20 <= y <= 60:  # Backtracking
+                        start_time = time.time()
                         solution = puzzle.backtracking_search()
                         step = 0
-                        end_time = time.time()
-                        elapsed_time = end_time - start_time
+                        elapsed_time = time.time() - start_time
                         print("\nKết quả của thuật toán Backtracking:")
-                        self.print_solution(solution)
+                        self.print_solution(solution, len(solution) if solution else 0)
                         print(f"Thời gian thực thi: {elapsed_time:.10f} giây")
+                        solution = (solution, len(solution) if solution else 0)
                         algorithm_run = True
                     elif 20 <= x <= 220 and 70 <= y <= 110:  # Forward Checking
+                        start_time = time.time()
                         solution = puzzle.forward_checking_search()
                         step = 0
-                        end_time = time.time()
-                        elapsed_time = end_time - start_time
+                        elapsed_time = time.time() - start_time
                         print("\nKết quả của thuật toán Forward Checking:")
-                        self.print_solution(solution)
+                        self.print_solution(solution, len(solution) if solution else 0)
                         print(f"Thời gian thực thi: {elapsed_time:.10f} giây")
+                        solution = (solution, len(solution) if solution else 0)
                         algorithm_run = True
                     elif 20 <= x <= 220 and 120 <= y <= 160:  # Min-Conflicts
+                        start_time = time.time()
                         solution = puzzle.min_conflicts_search()
                         step = 0
-                        end_time = time.time()
-                        elapsed_time = end_time - start_time
+                        elapsed_time = time.time() - start_time
                         print("\nKết quả của thuật toán Min-Conflicts:")
-                        self.print_solution(solution)
+                        self.print_solution(*solution)
                         print(f"Thời gian thực thi: {elapsed_time:.10f} giây")
                         algorithm_run = True
-                    elif 20 <= x <= 220 and 170 <= y <= 210: 
-                        solution = [initial_state]  
+                    elif 20 <= x <= 220 and 170 <= y <= 210:  # Reset
+                        numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                        random.shuffle(numbers)
+                        initial_state = [[0 for _ in range(3)] for _ in range(3)]
+                        idx = 0
+                        for i in range(3):
+                            for j in range(3):
+                                initial_state[i][j] = numbers[idx]
+                                idx += 1
+                        puzzle = self.EightPuzzle(initial_state, goal_state)
+                        solution = None
                         step = 0
                         elapsed_time = None
                         algorithm_run = False
-                        puzzle = self.EightPuzzle(initial_state, goal_state)  
-                        self.draw_grid(screen, initial_state, 100, 250, 50)  
-                        pygame.display.flip()
 
             pygame.display.flip()
-            clock.tick(60)
+            clock.tick(FPS)
+            await asyncio.sleep(1.0 / FPS)
 
         pygame.quit()
 
@@ -1454,7 +1482,7 @@ class Belief:
             label = font.render("Partial Observable", True, (0, 0, 0))
             text_width, text_height = label.get_size()
             text_x = partial_button_rect.x + (partial_button_rect.width - text_width) // 2
-            text_y = partial_button_rect.y + (partial_button_rect.height - text_height) // 2
+            text_y = partial_button_rect.y + (belief_button_rect.height - text_height) // 2
             screen.blit(label, (text_x, text_y))
 
             if belief_history and (animating or step > 0):
@@ -1546,7 +1574,7 @@ async def main():
                     await program_a.run()
                 elif 100 <= x <= 300 and 150 <= y <= 190:  
                     program_b = CSPs()
-                    program_b.run()
+                    await program_b.run()
                 elif 100 <= x <= 300 and 250 <= y <= 290:  
                     program_c = Belief()
                     await program_c.run()
